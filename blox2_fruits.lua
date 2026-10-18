@@ -1,38 +1,36 @@
 -- ═══════════════════════════════════════════════════════════
--- [[ OMEGA CONTROL PANEL | RIGHTS: @kL_ow ]]
--- قائمة قابلة للسحب + أزرار تشغيل وإيقاف + حقوق ثابتة
+-- [[ OMEGA FINAL FIX | RIGHTS: @kL_ow ]]
+-- قائمة قابلة للسحب + زرين فقط + بدون أي أخطاء
 -- ═══════════════════════════════════════════════════════════
 
 local OWNER = "@kL_ow"
-local TELEGRAM = "@kL_ow"
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local LP = Players.LocalPlayer
 
--- إشعار الحقوق
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "👑 OMEGA CONTROL",
+    Title = "👑 OMEGA FINAL",
     Text = "تم التحميل | الحقوق لـ " .. OWNER,
     Duration = 5
 })
 
--- 1. حقوقك في نص الشاشة (Watermark)
+-- حقوقك في النص
 local Watermark = Instance.new("TextLabel")
 Watermark.Size = UDim2.new(0, 500, 0, 30)
 Watermark.Position = UDim2.new(0.5, -250, 0, 5) 
 Watermark.BackgroundTransparency = 1
-Watermark.Text = "👑 " .. OWNER .. " | " .. TELEGRAM
+Watermark.Text = "👑 " .. OWNER .. " | TG: " .. OWNER
 Watermark.TextColor3 = Color3.fromRGB(255, 215, 0) 
 Watermark.TextStrokeTransparency = 0.5
 Watermark.Font = Enum.Font.GothamBold
 Watermark.TextSize = 16
 Watermark.Parent = game.CoreGui
 
--- 2. الواجهة (القائمة)
+-- القائمة
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "OmegaControlPanel"
+ScreenGui.Name = "OmegaFinal"
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 200, 0, 150)
@@ -44,7 +42,7 @@ MainFrame.Parent = ScreenGui
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 Instance.new("UIStroke", MainFrame).Color = Color3.fromRGB(255, 215, 0)
 
--- شريط العنوان (عشان نسحب منه)
+-- شريط السحب
 local TopBar = Instance.new("Frame", MainFrame)
 TopBar.Size = UDim2.new(1, 0, 0, 30)
 TopBar.BackgroundColor3 = Color3.fromRGB(30, 25, 10)
@@ -62,7 +60,7 @@ Title.TextSize = 12
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = TopBar
 
--- زر الإغلاق (X)
+-- زر الإغلاق
 local CloseBtn = Instance.new("TextButton", TopBar)
 CloseBtn.Size = UDim2.new(0, 20, 0, 20)
 CloseBtn.Position = UDim2.new(1, -25, 0, 5)
@@ -74,7 +72,7 @@ CloseBtn.TextSize = 10
 CloseBtn.Parent = TopBar
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
--- نظام السحب (Drag)
+-- السحب
 local dragging, dragInput, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -98,13 +96,11 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- إخفاء القائمة عند الضغط على X
-CloseBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-end)
+CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
 
--- نظام القتل التلقائي
+-- القتل التلقائي
 local AutoFarm = false
+
 local function GetMyLevel()
     local stats = LP:FindFirstChild("leaderstats")
     if stats then
@@ -151,7 +147,7 @@ local function StartAutoFarm()
     end)
 end
 
--- الأزرار (تشغيل / إيقاف)
+-- الأزرار
 local function makeBtn(text, y, cb, color)
     local b = Instance.new("TextButton", MainFrame)
     b.Size = UDim2.new(1, -20, 0, 40)
@@ -166,13 +162,13 @@ local function makeBtn(text, y, cb, color)
     b.MouseButton1Click:Connect(function() pcall(cb) end)
 end
 
-makeBtn("▶️ تشغيل القتل التلقائي", 40, function()
+makeBtn("▶️ تشغيل", 40, function()
     if not AutoFarm then
         AutoFarm = true
         StartAutoFarm()
     end
 end, Color3.fromRGB(40, 150, 40))
 
-makeBtn("⏹️ إيقاف القتل التلقائي", 90, function()
+makeBtn("⏹️ إيقاف", 90, function()
     AutoFarm = false
 end, Color3.fromRGB(150, 40, 40))
