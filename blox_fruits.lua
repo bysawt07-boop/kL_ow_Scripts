@@ -1,16 +1,14 @@
--- ═══════════════════════════════════════════════════════════
--- [[ BLOX FRUITS PRIME | RIGHTS: @kL_ow ]]
--- لفل تلقائي + تنقل بين الجزر + بدون ديسكورد
--- ═══════════════════════════════════════════════════════════
 
 local OWNER = "@kL_ow"
 
 -- إشعار الحقوق
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "⚡ PRIME BLOX | " .. OWNER,
-    Text = "تم التحميل | الحقوق محفوظة لـ " .. OWNER,
+    Title = "⚡ BLOX UNIVERSAL | " .. OWNER,
+    Text = "تم التحميل | الحقوق لـ " .. OWNER,
     Duration = 5
 })
 
--- تحميل سكربت Prime Hub (بدون ديسكورد وبدون مفاتيح)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/PrimoScripts/PrimoHub/main/PrimoHub.lua"))()
+--
+pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Do%20Not%20Modify%20Files/PlaceId/2753915549.lua"))()
+end)
