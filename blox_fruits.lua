@@ -1,148 +1,178 @@
 -- ═══════════════════════════════════════════════════════════
--- [[ OMEGA PRO FARM v2 | RIGHTS: @kL_ow ]]
--- ذكي: يبحث عن أعداء يناسبون مستواك الحالي
+-- [[ OMEGA CONTROL PANEL | RIGHTS: @kL_ow ]]
+-- قائمة قابلة للسحب + أزرار تشغيل وإيقاف + حقوق ثابتة
 -- ═══════════════════════════════════════════════════════════
 
 local OWNER = "@kL_ow"
-local TELEGRAM = "t.me/YourTelegramLink" -- ← غير هذا لرابط تلكرامك
+local TELEGRAM = "@kL_ow"
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 local LP = Players.LocalPlayer
 
 -- إشعار الحقوق
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "👑 OMEGA PRO FARM v2 | " .. OWNER,
+    Title = "👑 OMEGA CONTROL",
     Text = "تم التحميل | الحقوق لـ " .. OWNER,
     Duration = 5
 })
 
 -- 1. حقوقك في نص الشاشة (Watermark)
 local Watermark = Instance.new("TextLabel")
-Watermark.Size = UDim2.new(0, 400, 0, 30)
-Watermark.Position = UDim2.new(0.5, -200, 0, 10)
+Watermark.Size = UDim2.new(0, 500, 0, 30)
+Watermark.Position = UDim2.new(0.5, -250, 0, 5) 
 Watermark.BackgroundTransparency = 1
-Watermark.Text = "👑 " .. OWNER .. " | TG: " .. TELEGRAM
-Watermark.TextColor3 = Color3.fromRGB(255, 215, 0)
-Watermark.TextStrokeTransparency = 0.3
+Watermark.Text = "👑 " .. OWNER .. " | " .. TELEGRAM
+Watermark.TextColor3 = Color3.fromRGB(255, 215, 0) 
+Watermark.TextStrokeTransparency = 0.5
 Watermark.Font = Enum.Font.GothamBold
 Watermark.TextSize = 16
 Watermark.Parent = game.CoreGui
 
--- واجهة السكربت
+-- 2. الواجهة (القائمة)
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "OmegaProFarmV2"
+ScreenGui.Name = "OmegaControlPanel"
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 220, 0, 160)
-MainFrame.Position = UDim2.new(0, 20, 0.5, -80)
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Position = UDim2.new(0, 20, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
 MainFrame.Parent = ScreenGui
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 Instance.new("UIStroke", MainFrame).Color = Color3.fromRGB(255, 215, 0)
 
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "⚡ SMART FARM v2 | " .. OWNER
+-- شريط العنوان (عشان نسحب منه)
+local TopBar = Instance.new("Frame", MainFrame)
+TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.BackgroundColor3 = Color3.fromRGB(30, 25, 10)
+TopBar.BorderSizePixel = 0
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel", TopBar)
+Title.Size = UDim2.new(1, -40, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Text = "👑 OMEGA | " .. OWNER
 Title.TextColor3 = Color3.fromRGB(255, 215, 0)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.Parent = MainFrame
+Title.TextSize = 12
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
 
-local function getHRP() return LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") end
-local function getHum() return LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") end
+-- زر الإغلاق (X)
+local CloseBtn = Instance.new("TextButton", TopBar)
+CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+CloseBtn.Position = UDim2.new(1, -25, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.new(1,1,1)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 10
+CloseBtn.Parent = TopBar
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
--- قراءة مستواك الحالي
+-- نظام السحب (Drag)
+local dragging, dragInput, dragStart, startPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+TopBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- إخفاء القائمة عند الضغط على X
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+end)
+
+-- نظام القتل التلقائي
+local AutoFarm = false
 local function GetMyLevel()
     local stats = LP:FindFirstChild("leaderstats")
     if stats then
         local level = stats:FindFirstChild("Level")
         if level then return level.Value end
     end
-    return 1 -- إذا ما لقينا المستوى، نفترض 1
+    return 1
 end
 
--- 2. الحماية (ما تموت)
-task.spawn(function()
-    while true do
-        task.wait(1)
-        local h = getHum()
-        if h then h.MaxHealth = math.huge; h.Health = math.huge end
-    end
-end)
-
--- 3. اللفل التلقائي الذكي (يضرب الأعداء حسب مستواك)
-local AutoFarm = false
-local function StartSmartFarm()
-    AutoFarm = not AutoFarm
-    if AutoFarm then
-        task.spawn(function()
-            while AutoFarm do
-                task.wait(0.2)
-                local hrp = getHRP()
+local function StartAutoFarm()
+    task.spawn(function()
+        while AutoFarm do
+            task.wait(0.1)
+            local hrp = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
                 local myLevel = GetMyLevel()
-                
-                if hrp then
-                    local bestEnemy = nil
-                    local bestScore = -math.huge
-                    
-                    -- البحث عن أفضل عدو يناسب مستواك
-                    for _, v in pairs(workspace:GetDescendants()) do
-                        if v:IsA("Humanoid") and v.Parent ~= LP.Character and v.Health > 0 then
-                            local t = v.Parent:FindFirstChild("HumanoidRootPart")
-                            if t then
-                                -- محاولة قراءة مستوى العدو
-                                local enemyLevel = 1
-                                local levelObj = v.Parent:FindFirstChild("Level") or (v.Parent:FindFirstChild("leaderstats") and v.Parent.leaderstats:FindFirstChild("Level"))
-                                if levelObj then
-                                    enemyLevel = levelObj.Value
-                                end
-                                
-                                -- الذكاء: نبحث عن عدو مستواه قريب من مستوانا (يعطي خبرة كاملة)
-                                -- إذا كان مستواه أعلى من مستوانا بكثير، نتجاهله
-                                -- إذا كان قريب أو أعلى بشوي، نروح له
-                                if enemyLevel >= (myLevel - 50) and enemyLevel <= (myLevel + 100) then
-                                    local dist = (t.Position - hrp.Position).Magnitude
-                                    -- نعطي أولوية للأعداء الأقرب
-                                    local score = 10000 - dist 
-                                    
-                                    if score > bestScore then
-                                        bestScore = score
-                                        bestEnemy = t
-                                    end
+                local bestEnemy, shortestDist = nil, math.huge
+                for _, v in pairs(workspace:GetDescendants()) do
+                    if v:IsA("Humanoid") and v.Parent ~= LP.Character and v.Health > 0 then
+                        local t = v.Parent:FindFirstChild("HumanoidRootPart")
+                        if t then
+                            local enemyLevel = 1
+                            local levelObj = v.Parent:FindFirstChild("Level") or (v.Parent:FindFirstChild("leaderstats") and v.Parent.leaderstats:FindFirstChild("Level"))
+                            if levelObj then enemyLevel = levelObj.Value end
+                            if enemyLevel >= (myLevel - 50) and enemyLevel <= (myLevel + 100) then
+                                local dist = (t.Position - hrp.Position).Magnitude
+                                if dist < shortestDist and dist < 1000 then
+                                    shortestDist = dist
+                                    bestEnemy = t
                                 end
                             end
                         end
                     end
-
-                    -- إذا لقينا عدو يناسب مستوانا، نطير له ونضربه
-                    if bestEnemy then
-                        hrp.CFrame = CFrame.new(bestEnemy.Position + Vector3.new(0, 5, 0))
-                        local tool = LP.Character:FindFirstChildWhichIsA("Tool")
-                        if tool then tool:Activate() end
-                    else
-                        -- إذا ما فيه أعداء يناسبون مستوانا، نطير مسافة عشوائية عشان نغير المنطقة
-                        hrp.CFrame = hrp.CFrame + Vector3.new(math.random(-500, 500), 50, math.random(-500, 500))
-                    end
+                end
+                if bestEnemy then
+                    hrp.CFrame = CFrame.new(bestEnemy.Position + Vector3.new(0, 5, 0))
+                    local tool = LP.Character:FindFirstChildWhichIsA("Tool")
+                    if tool then tool:Activate() end
+                else
+                    hrp.CFrame = hrp.CFrame + Vector3.new(math.random(-300, 300), 50, math.random(-300, 300))
                 end
             end
-        end)
-    end
+        end
+    end)
 end
 
--- الأزرار
+-- الأزرار (تشغيل / إيقاف)
 local function makeBtn(text, y, cb, color)
     local b = Instance.new("TextButton", MainFrame)
     b.Size = UDim2.new(1, -20, 0, 40)
     b.Position = UDim2.new(0, 10, 0, y)
-    b.BackgroundColor3 = color or Color3.fromRGB(40, 30, 20)
+    b.BackgroundColor3 = color
     b.TextColor3 = Color3.new(1,1,1)
     b.Text = text
     b.Font = Enum.Font.GothamBold
+    b.TextSize = 12
     b.Parent = MainFrame
     Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
     b.MouseButton1Click:Connect(function() pcall(cb) end)
 end
 
-makeBtn("⚔️ تشغيل/إيقاف اللفل التلقائي", 50, StartSmartFarm, Color3.fromRGB(150, 50, 50))
+makeBtn("▶️ تشغيل القتل التلقائي", 40, function()
+    if not AutoFarm then
+        AutoFarm = true
+        StartAutoFarm()
+    end
+end, Color3.fromRGB(40, 150, 40))
+
+makeBtn("⏹️ إيقاف القتل التلقائي", 90, function()
+    AutoFarm = false
+end, Color3.fromRGB(150, 40, 40))
