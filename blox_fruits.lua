@@ -1,6 +1,6 @@
 -- ═══════════════════════════════════════════════════════════
--- [[ OMEGA BLOX ULTIMATE | RIGHTS: @kL_ow ]]
--- الميزات: لفل تلقائي (Auto Farm) + ضرب تلقائي + طيران
+-- [[ OMEGA SMART FARM | RIGHTS: @kL_ow ]]
+-- يقتل الأعداء -> يبحث عن منطقة جديدة -> يجمع مستوى
 -- ═══════════════════════════════════════════════════════════
 
 local OWNER = "@kL_ow"
@@ -10,7 +10,7 @@ local LP = Players.LocalPlayer
 
 -- إشعار الحقوق
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "👑 OMEGA BLOX ULTIMATE | " .. OWNER,
+    Title = "🧠 OMEGA SMART FARM | " .. OWNER,
     Text = "تم التحميل | الحقوق لـ " .. OWNER,
     Duration = 5
 })
@@ -18,7 +18,7 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 -- واجهة السكربت
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "OmegaBloxUltimate"
+ScreenGui.Name = "OmegaSmartFarm"
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 260, 0, 250)
@@ -27,12 +27,12 @@ MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
-Instance.new("UIStroke", MainFrame).Color = Color3.fromRGB(0, 255, 150)
+Instance.new("UIStroke", MainFrame).Color = Color3.fromRGB(0, 255, 255)
 
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "👑 OMEGA ULTIMATE | " .. OWNER
-Title.TextColor3 = Color3.fromRGB(0, 255, 150)
+Title.Text = "🧠 SMART FARM | " .. OWNER
+Title.TextColor3 = Color3.fromRGB(0, 255, 255)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
 Title.Parent = MainFrame
@@ -40,7 +40,7 @@ Title.Parent = MainFrame
 local function getHRP() return LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") end
 local function getHum() return LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") end
 
--- 1. الحماية (ما تموت)
+-- 1. حماية (ما تموت)
 task.spawn(function()
     while true do
         task.wait(1)
@@ -49,26 +49,27 @@ task.spawn(function()
     end
 end)
 
--- 2. اللفل التلقائي والضرب التلقائي (Auto Farm + Kill Aura)
+-- 2. اللفل التلقائي الذكي
 local AutoFarm = false
-local function StartAutoFarm()
+local function StartSmartFarm()
     AutoFarm = not AutoFarm
     if AutoFarm then
         task.spawn(function()
             while AutoFarm do
-                task.wait(0.1)
+                task.wait(0.2)
                 local hrp = getHRP()
                 if hrp then
                     local closestEnemy = nil
                     local shortestDist = math.huge
                     
-                    -- البحث عن أقرب عدو
+                    -- نبحث عن أي عدو في الماب
                     for _, v in pairs(workspace:GetDescendants()) do
                         if v:IsA("Humanoid") and v.Parent ~= LP.Character and v.Health > 0 then
                             local t = v.Parent:FindFirstChild("HumanoidRootPart")
                             if t then
                                 local dist = (t.Position - hrp.Position).Magnitude
-                                if dist < shortestDist and dist < 150 then -- مدى 150 متر
+                                -- نبحث عن عدو في نطاق 1000 متر
+                                if dist < shortestDist and dist < 1000 then
                                     shortestDist = dist
                                     closestEnemy = t
                                 end
@@ -76,11 +77,14 @@ local function StartAutoFarm()
                         end
                     end
 
-                    -- إذا لقينا عدو، نروح له ونضربه
+                    -- إذا لقينا عدو، نطير له ونضربه
                     if closestEnemy then
                         hrp.CFrame = CFrame.new(closestEnemy.Position + Vector3.new(0, 5, 0))
                         local tool = LP.Character:FindFirstChildWhichIsA("Tool")
                         if tool then tool:Activate() end
+                    else
+                        -- إذا ما فيه أعداء قريبين، نطير لمنطقة أبعد (بحث عشوائي)
+                        hrp.CFrame = hrp.CFrame + Vector3.new(math.random(-500, 500), 50, math.random(-500, 500))
                     end
                 end
             end
@@ -88,7 +92,7 @@ local function StartAutoFarm()
     end
 end
 
--- 3. الطيران (Fly)
+-- 3. الطيران (للهروب أو التنقل)
 local Fly = false
 local function ToggleFly()
     Fly = not Fly
@@ -130,9 +134,9 @@ local function makeBtn(text, y, cb, color)
     b.MouseButton1Click:Connect(function() pcall(cb) end)
 end
 
-makeBtn("⚔️ تشغيل/إيقاف اللفل التلقائي", 50, StartAutoFarm, Color3.fromRGB(150, 50, 50))
+makeBtn("⚔️ تشغيل/إيقاف اللفل التلقائي الذكي", 50, StartSmartFarm, Color3.fromRGB(150, 50, 50))
 makeBtn("🦅 تشغيل/إيقاف الطيران", 100, ToggleFly, Color3.fromRGB(50, 100, 150))
-makeBtn("⚡ تفعيل السرعة 150", 150, function()
+makeBtn("⚡ سرعة 150", 150, function()
     task.spawn(function()
         while true do
             task.wait(0.5)
